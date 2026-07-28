@@ -1,7 +1,8 @@
 """Seed the database with demo leads.
 
-Tries a real OpenStreetMap search first; if the network is unavailable it
-falls back to synthetic demo companies so the UI is populated for a demo.
+Tries a real key-free search first (Yandex.Maps → OpenStreetMap fallback); if
+the network is unavailable it falls back to synthetic demo companies so the UI
+is populated for a demo.
 
 Run:  python -m scripts.seed
 """
@@ -87,7 +88,7 @@ async def analyze_all():
 
 async def main():
     await init_db()
-    print("Seeding real data from OpenStreetMap...")
+    print("Seeding real data from Yandex.Maps / OpenStreetMap (key-free)...")
     saved = await seed_real()
     if saved == 0:
         print("No network/real data — inserting synthetic demo companies...")

@@ -32,9 +32,24 @@ class Settings(BaseSettings):
     NOMINATIM_URL: str = "https://nominatim.openstreetmap.org"
     USER_AGENT: str = "AILeadHunter/1.0 (+https://github.com/ai-lead-hunter)"
 
-    # Optional map / geocoding providers (used if keys provided)
+    # Yandex Maps — KEY-FREE web scraper (no YANDEX_MAPS_API_KEY needed).
+    # Reads the public Yandex Maps SERP and parses the JSON that Yandex embeds
+    # in the page. A browser-like User-Agent is required for the SERP host.
+    YANDEX_MAPS_BASE_URL: str = "https://yandex.ru/maps/"
+    YANDEX_USER_AGENT: str = (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+    )
+    YANDEX_SCRAPER_TIMEOUT: float = 30.0
+    YANDEX_SCRAPER_MAX_PAGES: int = 4        # best-effort extra pages via internal API
+    YANDEX_SCRAPER_DELAY: float = 1.2        # polite pause between paginated calls (s)
+    # If the Yandex scraper is blocked (captcha) or returns nothing, transparently
+    # fall back to the always-available, key-free OpenStreetMap provider.
+    YANDEX_SEARCH_FALLBACK_OSM: bool = True
+
+    # Optional map providers (used only if a key is provided)
     GOOGLE_MAPS_API_KEY: str = ""
-    YANDEX_MAPS_API_KEY: str = ""
+    YANDEX_MAPS_API_KEY: str = ""  # deprecated / unused — Yandex now works key-free
     TWOGIS_API_KEY: str = ""
 
     # LLM — offer generation & AI chat fall back to templates/rules when empty

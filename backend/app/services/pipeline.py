@@ -6,8 +6,9 @@ from datetime import datetime, timezone
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.models import Analysis, Company
-from app.models.enums import CRMStatus
+from app.models.enums import CRMStatus, Source
 from app.services.analyzer.website import analyze_website
 from app.services.parser.osm import RawCompany
 from app.services.parser.registry import get_parser
@@ -65,12 +66,30 @@ async def search_and_ingest(
     region: str | None = None,
     radius_km: float | None = None,
     limit: int = 50,
-    source: str = "openstreetmap",
+    source: str = Source.yandex_maps.value,
 ) -> tuple[int, list[int]]:
-    provider = get_parser(source)
-    raw = await provider.search(
-        query=query, city=city, country=country, region=region, radius_km=radius_km, limit=limit
+    """Run the selected provider, ingest results, and return (found, saved_ids).
+
+    Yandex.Maps is the key-free default. If it is blocked (captcha) or returns
+    nothing, we transparently fall back to OpenStreetMap so search keeps working
+    with zero configuration.
+    """
+    kwargs = dict(
+        query=query, city=city, country=country, region=region,
+        radius_km=radius_km, limit=limit,
     )
+    use_fallback = source == Source.yandex_maps.value and settings.YANDEX_SEARCH_FALLBACK_OSM
+
+    try:
+        raw = await get_parser(source).search(**kwargs)
+    except Exception:  # noqa: BLE001
+        if not use_fallback:
+            raise
+        raw = []
+
+    if not raw and use_fallback:
+        raw = await get_parser(Source.osm.value).search(**kwargs)
+
     ids = await ingest_raw(db, raw)
     return len(raw), ids
 
