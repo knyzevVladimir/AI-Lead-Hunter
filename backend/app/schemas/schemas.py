@@ -15,7 +15,7 @@ class SearchRequest(BaseModel):
     region: str | None = None
     radius_km: float | None = Field(None, ge=0, le=100, description="Radius around city center")
     limit: int = Field(50, ge=1, le=500)
-    source: Source = Source.osm
+    source: Source = Source.yandex_maps  # key-free scraper; auto-falls back to OSM
 
 
 class SearchResult(BaseModel):

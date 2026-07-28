@@ -53,10 +53,10 @@ const FILTERS: { key: BoolFilterKey; label: string }[] = [
 ];
 
 const SOURCES = [
-  { value: "openstreetmap", label: "OpenStreetMap" },
-  { value: "google_maps", label: "Google Maps" },
-  { value: "yandex_maps", label: "Яндекс.Карты" },
-  { value: "2gis", label: "2ГИС" },
+  { value: "yandex_maps", label: "Яндекс.Карты (без ключа)" },
+  { value: "openstreetmap", label: "OpenStreetMap (без ключа)" },
+  { value: "google_maps", label: "Google Maps (нужен ключ)" },
+  { value: "2gis", label: "2ГИС (нужен ключ)" },
 ];
 
 const LIMIT = 100;
@@ -69,7 +69,7 @@ export default function LeadsPage() {
   const [city, setCity] = useState("");
   const [radiusKm, setRadiusKm] = useState("");
   const [searchLimit, setSearchLimit] = useState("50");
-  const [source, setSource] = useState("openstreetmap");
+  const [source, setSource] = useState("yandex_maps");
 
   // --- Filter chips ---
   const [filters, setFilters] = useState<Record<BoolFilterKey, boolean>>({

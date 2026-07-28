@@ -22,11 +22,13 @@ def get_parser(source: str):
 
 
 def provider_configured(source: str) -> bool:
-    """Whether the given provider has the credentials it needs."""
+    """Whether the given provider has the credentials it needs.
+
+    OSM and Yandex.Maps are key-free (Yandex is scraped from the public web),
+    so they are always considered configured. Google and 2GIS still need keys.
+    """
     if source == Source.google_maps.value:
         return bool(settings.GOOGLE_MAPS_API_KEY)
-    if source == Source.yandex_maps.value:
-        return bool(settings.YANDEX_MAPS_API_KEY)
     if source == Source.twogis.value:
         return bool(settings.TWOGIS_API_KEY)
-    return True  # OSM needs no key
+    return True  # OSM + Yandex.Maps need no key

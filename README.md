@@ -8,7 +8,7 @@
 
 ## ✨ Что уже работает «из коробки»
 
-- 🔎 **Поиск бизнеса** через **OpenStreetMap** (Overpass + Nominatim) — **без API-ключей**. Провайдеры **Google Places**, **Яндекс.Карты**, **2ГИС** подключаются добавлением ключа.
+- 🔎 **Поиск бизнеса — полностью без API-ключей**: **Яндекс.Карты** (парсер публичной выдачи, источник по умолчанию — отдаёт телефоны, сайты, рейтинги, отзывы, часы работы) и **OpenStreetMap** (Overpass + Nominatim, автоматический резерв, если Яндекс недоступен). **Google Places** и **2ГИС** — опционально, при наличии ключа.
 - 🧠 **Реальный анализ сайта**: HTTPS/SSL, мобильная версия, favicon, форма связи, онлайн-запись, карта, SEO (title/description/H1), `robots.txt`, `sitemap.xml`, скорость загрузки, современность дизайна.
 - 📊 **AI Score 0–100** — оценка перспективности лида + разбор слабых мест + список услуг, которые можно предложить.
 - ✉️ **Генерация персонального предложения** (шаблон + LLM через OpenAI-совместимый эндпоинт: OpenAI / Ollama / vLLM).
@@ -84,13 +84,14 @@ npm run dev                                # http://localhost:3000
 
 ## 🔌 Подключение внешних API
 
-Все ключи задаются в `.env` (см. `.env.example`). Ничего не задано → используется бесплатный OSM, а офферы/чат работают в шаблонном режиме.
+Все ключи задаются в `.env` (см. `.env.example`). Ключи для поиска **не нужны**: по умолчанию работают Яндекс.Карты (парсер) и OpenStreetMap. Ничего не задано → поиск идёт через Яндекс/OSM без ключей, а офферы/чат работают в шаблонном режиме. Из внешних сервисов реально нужен только email-провайдер (для рассылки).
 
 | Категория | Переменные | Заметки |
 |-----------|-----------|---------|
-| Google Places | `GOOGLE_MAPS_API_KEY` | Places API (New), Text Search |
-| Яндекс.Карты | `YANDEX_MAPS_API_KEY` | Geosearch `type=biz` |
-| 2ГИС | `TWOGIS_API_KEY` | Catalog API (contact_groups — платно) |
+| **Яндекс.Карты** | **— (без ключа)** | **Парсер публичной выдачи, источник по умолчанию. Авто-резерв → OSM** |
+| OpenStreetMap | — (без ключа) | Overpass + Nominatim, резервный источник |
+| Google Places | `GOOGLE_MAPS_API_KEY` | Опционально. Places API (New), Text Search |
+| 2ГИС | `TWOGIS_API_KEY` | Опционально. Catalog API (contact_groups — платно) |
 | LLM | `OPENAI_API_KEY`, `OPENAI_MODEL`, `OPENAI_BASE_URL` | OpenAI / Ollama / vLLM |
 | Email SMTP | `SMTP_HOST/PORT/USER/PASSWORD/FROM` | 587 STARTTLS или 465 SSL |
 | Gmail | `GMAIL_CLIENT_ID/SECRET/REFRESH_TOKEN/FROM` | scope `gmail.send` |
