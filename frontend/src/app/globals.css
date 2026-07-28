@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,19 +5,35 @@
 @layer base {
   :root {
     color-scheme: dark;
+
+    /* Motion tokens — reused by the JS reveal/counter primitives. */
+    --ease-spring: cubic-bezier(0.22, 1.4, 0.36, 1);
+    --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   html,
   body {
     background-color: #0b1020;
     color: #e7ecf5;
-    font-family: "Inter", system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
 
   body {
     min-height: 100vh;
+    /* Deep-space base: two radial pools of colour behind everything. */
+    background-image:
+      radial-gradient(
+        900px 600px at 12% -8%,
+        rgba(59, 108, 255, 0.16),
+        transparent 60%
+      ),
+      radial-gradient(
+        800px 520px at 92% 4%,
+        rgba(167, 139, 250, 0.12),
+        transparent 62%
+      );
+    background-attachment: fixed;
   }
 
   * {
@@ -29,6 +43,17 @@
   a {
     color: inherit;
     text-decoration: none;
+  }
+
+  /* Keyboard focus stays visible even where we remove default outlines. */
+  :focus-visible {
+    outline: 2px solid rgba(92, 140, 255, 0.7);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: rgba(59, 108, 255, 0.35);
+    color: #fff;
   }
 
   /* Subtle scrollbars */
@@ -55,16 +80,51 @@
 }
 
 @layer components {
-  /* Card surface used across the app */
+  /* ---------------------------------------------------------------- */
+  /* Surfaces                                                          */
+  /* ---------------------------------------------------------------- */
+
+  /* Card surface used across the app. Frosted, with a hairline top
+     highlight so panels read as lit from above. */
   .card {
-    @apply rounded-xl border border-white/10 bg-panel;
+    @apply relative rounded-xl border border-white/10 bg-panel/80 shadow-inner-top backdrop-blur-xl;
   }
 
   .card-hover {
-    @apply transition-colors hover:border-white/20;
+    @apply transition-all duration-300 ease-smooth hover:-translate-y-0.5
+      hover:border-white/20 hover:shadow-lift;
   }
 
-  /* Section / page heading */
+  /* Glass panel — lighter than .card, for overlays and floating chrome. */
+  .glass {
+    @apply rounded-xl border border-white/10 bg-white/[0.04] backdrop-blur-xl;
+  }
+
+  /* Gradient hairline border via mask; sits on top of any surface. */
+  .ring-gradient::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      rgba(92, 140, 255, 0.55),
+      rgba(167, 139, 250, 0.25) 40%,
+      transparent 70%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Typography                                                        */
+  /* ---------------------------------------------------------------- */
+
   .page-title {
     @apply text-2xl font-bold tracking-tight text-white;
   }
@@ -73,46 +133,106 @@
     @apply text-sm text-muted;
   }
 
-  /* Inputs */
+  .display {
+    @apply text-4xl font-extrabold leading-[1.05] tracking-tight text-white
+      sm:text-5xl;
+  }
+
+  /* Animated metallic gradient text for hero words. */
+  .gradient-text {
+    @apply animate-sheen bg-brand-sheen bg-sheen bg-clip-text text-transparent;
+  }
+
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.18em] text-muted;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Inputs                                                            */
+  /* ---------------------------------------------------------------- */
+
   .input {
-    @apply w-full rounded-lg border border-white/10 bg-ink px-3 py-2 text-sm
-      text-white placeholder:text-muted/70
-      focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500;
+    @apply w-full rounded-lg border border-white/10 bg-ink/80 px-3 py-2 text-sm
+      text-white transition-all duration-200 placeholder:text-muted/70
+      hover:border-white/20
+      focus:border-brand-500 focus:bg-ink focus:outline-none
+      focus:ring-2 focus:ring-brand-500/40;
   }
 
   .label {
     @apply mb-1 block text-xs font-medium uppercase tracking-wide text-muted;
   }
 
-  /* Buttons */
+  /* ---------------------------------------------------------------- */
+  /* Buttons                                                           */
+  /* ---------------------------------------------------------------- */
+
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2
-      text-sm font-medium transition-colors disabled:cursor-not-allowed
-      disabled:opacity-50;
+    @apply relative inline-flex select-none items-center justify-center gap-2
+      overflow-hidden rounded-lg px-4 py-2 text-sm font-medium
+      transition-all duration-200 ease-smooth
+      active:scale-[0.97]
+      disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100;
   }
+
   .btn-primary {
-    @apply btn bg-brand-500 text-white hover:bg-brand-600;
+    @apply btn bg-brand-500 text-white shadow-[0_6px_20px_-8px_rgba(59,108,255,0.9)]
+      hover:-translate-y-0.5 hover:bg-brand-400
+      hover:shadow-[0_12px_28px_-10px_rgba(59,108,255,1)]
+      disabled:hover:translate-y-0;
   }
+
+  /* Light sweep that crosses primary buttons on hover. */
+  .btn-primary::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      110deg,
+      transparent 20%,
+      rgba(255, 255, 255, 0.35) 50%,
+      transparent 80%
+    );
+    transform: translateX(-120%);
+    transition: transform 0.7s var(--ease-smooth);
+    pointer-events: none;
+  }
+  .btn-primary:hover::after {
+    transform: translateX(120%);
+  }
+
   .btn-secondary {
-    @apply btn border border-white/10 bg-white/5 text-white hover:bg-white/10;
+    @apply btn border border-white/10 bg-white/5 text-white
+      hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/10
+      disabled:hover:translate-y-0;
   }
+
   .btn-ghost {
     @apply btn text-muted hover:bg-white/5 hover:text-white;
   }
 
-  /* Chips */
+  /* ---------------------------------------------------------------- */
+  /* Chips                                                             */
+  /* ---------------------------------------------------------------- */
+
   .chip {
-    @apply inline-flex items-center gap-1.5 rounded-full border px-3 py-1
-      text-xs font-medium transition-colors;
+    @apply inline-flex select-none items-center gap-1.5 rounded-full border
+      px-3 py-1 text-xs font-medium transition-all duration-200 ease-spring
+      active:scale-95;
   }
   .chip-off {
-    @apply chip border-white/10 bg-transparent text-muted hover:border-white/20 hover:text-white;
+    @apply chip border-white/10 bg-transparent text-muted
+      hover:-translate-y-0.5 hover:border-white/25 hover:bg-white/5 hover:text-white;
   }
   .chip-on {
-    @apply chip border-brand-500/60 bg-brand-500/15 text-brand-100;
+    @apply chip border-brand-400/60 bg-brand-500/20 text-brand-100
+      shadow-[0_0_18px_-4px_rgba(59,108,255,0.8)];
   }
 
-  /* Table helpers */
+  /* ---------------------------------------------------------------- */
+  /* Tables                                                            */
+  /* ---------------------------------------------------------------- */
+
   .th {
     @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted;
   }
@@ -120,7 +240,102 @@
     @apply px-4 py-3 align-middle text-sm text-white/90;
   }
 
+  /* Row that lifts a hairline accent on hover. */
+  .row-hover {
+    @apply relative transition-colors duration-200 hover:bg-white/[0.04];
+  }
+  .row-hover::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      #5c8cff 35%,
+      #a78bfa 65%,
+      transparent
+    );
+    transform: scaleY(0);
+    transform-origin: center;
+    transition: transform 0.3s var(--ease-smooth);
+  }
+  .row-hover:hover::after {
+    transform: scaleY(1);
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Loading                                                           */
+  /* ---------------------------------------------------------------- */
+
+  /* Skeleton with a travelling light sweep rather than a flat pulse. */
   .skeleton {
-    @apply animate-pulse rounded-md bg-white/5;
+    @apply relative overflow-hidden rounded-md bg-white/[0.06];
+  }
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.08),
+      transparent
+    );
+    animation: shimmer 1.8s infinite;
+  }
+}
+
+@layer utilities {
+  /* Perspective wrapper for the mouse-tilt cards. */
+  .perspective {
+    perspective: 1000px;
+  }
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+
+  /* Promote to its own layer — used on the canvas + aurora blobs. */
+  .gpu {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  /* Text that stays legible over the globe canvas. */
+  .text-shadow-glow {
+    text-shadow: 0 0 24px rgba(59, 108, 255, 0.45);
+  }
+
+  .mask-fade-b {
+    -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent);
+    mask-image: linear-gradient(to bottom, #000 60%, transparent);
+  }
+}
+
+/* -------------------------------------------------------------------- */
+/* Accessibility: honour the OS "reduce motion" setting everywhere.      */
+/* The JS primitives check this too, but this catches pure-CSS motion.   */
+/* -------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .card-hover:hover,
+  .btn-primary:hover,
+  .btn-secondary:hover,
+  .chip-off:hover {
+    transform: none;
   }
 }

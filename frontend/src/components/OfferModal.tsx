@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Check, Copy, Loader2, Sparkles, X, FileText } from "lucide-react";
+import { Check, Copy, FileText, Sparkles, X } from "lucide-react";
+import clsx from "clsx";
 import { generateOffer } from "@/lib/api";
 
 interface OfferModalProps {
@@ -11,12 +12,33 @@ interface OfferModalProps {
   onClose: () => void;
 }
 
+/**
+ * Three bouncing dots that communicate "AI is generating".
+ * Staggered animationDelay so each dot peaks at a different moment.
+ */
+function BouncingDots() {
+  return (
+    <div className="flex items-center gap-1.5" aria-hidden>
+      {[0, 160, 320].map((delay) => (
+        <span
+          key={delay}
+          className="inline-block h-2 w-2 rounded-full bg-brand-400 animate-bounce-dot"
+          style={{ animationDelay: `${delay}ms` }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function OfferModal({
   companyId,
   companyName,
   onClose,
 }: OfferModalProps) {
   const [copied, setCopied] = useState(false);
+  /* Track the element that opened the modal so focus can be restored. */
+  const previousFocusRef = useRef<Element | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["offer", companyId],
@@ -25,11 +47,63 @@ export default function OfferModal({
     staleTime: 0,
   });
 
-  // Close on Escape key.
+  /* ── Body scroll lock ── */
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
+  /* ── Focus management ── */
+  useEffect(() => {
+    previousFocusRef.current = document.activeElement;
+    /* Focus the panel itself so Tab begins inside it. */
+    panelRef.current?.focus();
+    return () => {
+      /* Restore focus to the triggering element on close. */
+      (previousFocusRef.current as HTMLElement | null)?.focus();
+    };
+  }, []);
+
+  /* ── Keyboard: Escape closes, Tab traps inside panel ── */
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+
+      if (e.key === "Tab" && panelRef.current) {
+        const focusable = Array.from(
+          panelRef.current.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          )
+        ).filter((el) => !el.closest("[aria-hidden]"));
+
+        if (focusable.length === 0) {
+          e.preventDefault();
+          return;
+        }
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
     };
+
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
@@ -47,44 +121,84 @@ export default function OfferModal({
   };
 
   return (
+    /* Backdrop: fades in, click-outside closes */
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="presentation"
       onClick={onClose}
     >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-ink/80 backdrop-blur-sm" />
-
-      {/* Panel */}
+      {/* Animated backdrop */}
       <div
-        className="relative z-10 flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-white/10 bg-panel shadow-2xl"
+        className="absolute inset-0 bg-ink/80 backdrop-blur-sm animate-fade-in"
+        aria-hidden
+      />
+
+      {/* Panel: scales + fades in for a spring-like entrance */}
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="offer-modal-title"
+        /* tabIndex so the panel itself can receive programmatic focus. */
+        tabIndex={-1}
+        className={clsx(
+          "relative z-10 flex max-h-[85vh] w-full max-w-2xl flex-col",
+          "overflow-hidden rounded-xl border border-white/10 bg-panel shadow-2xl",
+          "ring-gradient",
+          /* Spring entrance — communicates that the modal is appearing, not just visible */
+          "animate-scale-in",
+          "focus:outline-none"
+        )}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
+        {/* ── Header ── */}
         <div className="flex items-start justify-between gap-4 border-b border-white/10 px-6 py-4">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-white">
+              <h2
+                id="offer-modal-title"
+                className="text-lg font-bold text-white"
+              >
                 Коммерческое предложение
               </h2>
+
+              {/* LLM vs template badge — unchanged behaviour */}
               {data &&
                 (data.used_llm ? (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-brand-500/40 bg-brand-500/15 px-2 py-0.5 text-[11px] font-semibold text-brand-100">
+                  <span
+                    className={clsx(
+                      "inline-flex items-center gap-1 rounded-full px-2 py-0.5",
+                      "border border-brand-500/40 bg-brand-500/15",
+                      "text-[11px] font-semibold text-brand-100",
+                      "animate-scale-in"
+                    )}
+                  >
                     <Sparkles className="h-3 w-3" />
                     AI (LLM)
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] font-semibold text-muted">
+                  <span
+                    className={clsx(
+                      "inline-flex items-center gap-1 rounded-full px-2 py-0.5",
+                      "border border-white/10 bg-white/5",
+                      "text-[11px] font-semibold text-muted",
+                      "animate-scale-in"
+                    )}
+                  >
                     <FileText className="h-3 w-3" />
                     Шаблон
                   </span>
                 ))}
             </div>
+
             {companyName && (
               <p className="mt-0.5 text-xs text-muted">
-                Компания: {companyName}
+                Компания:{" "}
+                <span className="text-white/70">{companyName}</span>
               </p>
             )}
           </div>
+
           <button
             onClick={onClose}
             className="rounded-lg p-1.5 text-muted transition-colors hover:bg-white/5 hover:text-white"
@@ -94,12 +208,15 @@ export default function OfferModal({
           </button>
         </div>
 
-        {/* Body */}
+        {/* ── Body ── */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
+          {/* Generating state: bouncing dots communicate active work. */}
           {isLoading && (
-            <div className="flex flex-col items-center justify-center gap-3 py-16 text-muted">
-              <Loader2 className="h-6 w-6 animate-spin text-brand-500" />
-              <span className="text-sm">Генерируем предложение…</span>
+            <div className="flex flex-col items-center justify-center gap-4 py-16 text-muted">
+              <BouncingDots />
+              <span className="text-sm animate-fade-in">
+                Генерируем предложение…
+              </span>
             </div>
           )}
 
@@ -113,7 +230,7 @@ export default function OfferModal({
           )}
 
           {data && (
-            <div className="space-y-4">
+            <div className="space-y-4 animate-fade-in">
               {data.subject && (
                 <div>
                   <div className="label">Тема</div>
@@ -132,7 +249,7 @@ export default function OfferModal({
           )}
         </div>
 
-        {/* Footer */}
+        {/* ── Footer ── */}
         <div className="flex items-center justify-end gap-3 border-t border-white/10 px-6 py-4">
           <button onClick={onClose} className="btn-ghost">
             Закрыть

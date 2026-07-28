@@ -224,3 +224,25 @@ export function getDashboard(): Promise<DashboardStats> {
 export function exportCsvUrl(params: ListLeadsParams = {}): string {
   return `${API_BASE}/export/csv${qs(params as Record<string, unknown>)}`;
 }
+
+/* ------------------------------------------------------------------ */
+/* Health                                                              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * `/health` is served at the app root, one level above the `/api` prefix that
+ * API_BASE points at, so strip that trailing segment.
+ */
+function healthUrl(): string {
+  return `${API_BASE.replace(/\/api\/?$/, "")}/health`;
+}
+
+/** Lightweight liveness probe backing the status pill in the top bar. */
+export async function checkHealth(): Promise<boolean> {
+  try {
+    const res = await fetch(healthUrl(), { cache: "no-store" });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
