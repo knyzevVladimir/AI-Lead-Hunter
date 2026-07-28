@@ -15,3 +15,6 @@ npm-debug.log*
 
 # Alembic local
 *.sqlite3
+
+# Next.js build artifacts
+*.tsbuildinfo
