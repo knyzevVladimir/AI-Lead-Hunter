@@ -7,11 +7,11 @@ interface ScoreBadgeProps {
 
 /**
  * Colored pill for the AI lead score (0–100).
- *  >=80 -> red (горячий лид)
- *  60–79 -> orange
- *  40–59 -> amber
- *  1–39 -> slate
- *  null/0 -> gray "—"
+ *  >=80 -> green (горячий лид)
+ *  60–79 -> amber
+ *  40–59 -> slate
+ *  1–39 -> gray
+ *  null/0 -> neutral "—"
  */
 export default function ScoreBadge({ score, className }: ScoreBadgeProps) {
   const value = score ?? 0;
@@ -20,7 +20,7 @@ export default function ScoreBadge({ score, className }: ScoreBadgeProps) {
     return (
       <span
         className={clsx(
-          "inline-flex min-w-[3rem] items-center justify-center rounded-md border border-white/10 bg-white/5 px-2 py-0.5 text-xs font-semibold text-muted",
+          "inline-flex min-w-[3rem] items-center justify-center rounded-md border border-line bg-slate-50 px-2 py-0.5 text-xs font-semibold text-faint",
           className
         )}
         title="Нет оценки"
@@ -32,13 +32,13 @@ export default function ScoreBadge({ score, className }: ScoreBadgeProps) {
 
   let tone: string;
   if (value >= 80) {
-    tone = "border-red-500/40 bg-red-500/15 text-red-300";
+    tone = "border-emerald-200 bg-emerald-50 text-emerald-700";
   } else if (value >= 60) {
-    tone = "border-orange-500/40 bg-orange-500/15 text-orange-300";
+    tone = "border-amber-200 bg-amber-50 text-amber-700";
   } else if (value >= 40) {
-    tone = "border-amber-500/40 bg-amber-500/15 text-amber-300";
+    tone = "border-slate-200 bg-slate-50 text-slate-600";
   } else {
-    tone = "border-slate-500/40 bg-slate-500/15 text-slate-300";
+    tone = "border-slate-200 bg-slate-50 text-slate-500";
   }
 
   return (
@@ -51,7 +51,7 @@ export default function ScoreBadge({ score, className }: ScoreBadgeProps) {
       title={value >= 80 ? "Горячий лид" : `AI-оценка: ${value}/100`}
     >
       {value}
-      <span className="opacity-60">/100</span>
+      <span className="opacity-50">/100</span>
     </span>
   );
 }

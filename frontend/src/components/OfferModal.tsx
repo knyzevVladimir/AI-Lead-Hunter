@@ -52,28 +52,28 @@ export default function OfferModal({
       onClick={onClose}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-ink/80 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" />
 
       {/* Panel */}
       <div
-        className="relative z-10 flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-white/10 bg-panel shadow-2xl"
+        className="relative z-10 flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-line bg-panel shadow-pop"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-start justify-between gap-4 border-b border-white/10 px-6 py-4">
+        <div className="flex items-start justify-between gap-4 border-b border-line px-6 py-4">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-white">
+              <h2 className="text-lg font-bold text-ink">
                 Коммерческое предложение
               </h2>
               {data &&
                 (data.used_llm ? (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-brand-500/40 bg-brand-500/15 px-2 py-0.5 text-[11px] font-semibold text-brand-100">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-brand-200 bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-700">
                     <Sparkles className="h-3 w-3" />
                     AI (LLM)
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] font-semibold text-muted">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-line bg-slate-50 px-2 py-0.5 text-[11px] font-semibold text-muted">
                     <FileText className="h-3 w-3" />
                     Шаблон
                   </span>
@@ -87,7 +87,7 @@ export default function OfferModal({
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-muted transition-colors hover:bg-white/5 hover:text-white"
+            className="rounded-lg p-1.5 text-muted transition-colors hover:bg-slate-100 hover:text-ink"
             aria-label="Закрыть"
           >
             <X className="h-5 w-5" />
@@ -104,9 +104,9 @@ export default function OfferModal({
           )}
 
           {isError && (
-            <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
               Не удалось сгенерировать предложение.
-              <div className="mt-1 text-xs text-red-300/70">
+              <div className="mt-1 text-xs text-rose-500">
                 {(error as Error)?.message}
               </div>
             </div>
@@ -117,14 +117,14 @@ export default function OfferModal({
               {data.subject && (
                 <div>
                   <div className="label">Тема</div>
-                  <div className="rounded-lg border border-white/10 bg-ink px-4 py-2.5 text-sm font-medium text-white">
+                  <div className="rounded-lg border border-line bg-slate-50/60 px-4 py-2.5 text-sm font-medium text-ink">
                     {data.subject}
                   </div>
                 </div>
               )}
               <div>
                 <div className="label">Текст ({data.channel})</div>
-                <div className="whitespace-pre-wrap rounded-lg border border-white/10 bg-ink px-4 py-3 text-sm leading-relaxed text-white/90">
+                <div className="whitespace-pre-wrap rounded-lg border border-line bg-slate-50/60 px-4 py-3 text-sm leading-relaxed text-ink">
                   {data.body}
                 </div>
               </div>
@@ -133,7 +133,7 @@ export default function OfferModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 border-t border-white/10 px-6 py-4">
+        <div className="flex items-center justify-end gap-3 border-t border-line px-6 py-4">
           <button onClick={onClose} className="btn-ghost">
             Закрыть
           </button>

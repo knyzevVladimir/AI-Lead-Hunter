@@ -16,6 +16,7 @@ interface IntegrationKey {
 interface IntegrationGroup {
   title: string;
   icon: LucideIcon;
+  iconBg: string;
   accent: string;
   blurb: string;
   keys: IntegrationKey[];
@@ -25,6 +26,7 @@ const GROUPS: IntegrationGroup[] = [
   {
     title: "Карты и поиск",
     icon: MapIcon,
+    iconBg: "bg-brand-50",
     accent: "text-brand-500",
     blurb:
       "Источники данных о локальном бизнесе. Яндекс.Карты (по умолчанию) и OpenStreetMap работают полностью без ключей. Google и 2ГИС — по желанию, при наличии ключа.",
@@ -52,7 +54,8 @@ const GROUPS: IntegrationGroup[] = [
   {
     title: "AI / LLM",
     icon: BrainCircuit,
-    accent: "text-purple-400",
+    iconBg: "bg-purple-50",
+    accent: "text-purple-500",
     blurb:
       "Модель для анализа сайтов, оценки лидов и генерации предложений. Поддерживаются OpenAI-совместимые эндпоинты (Ollama, vLLM).",
     keys: [
@@ -74,7 +77,8 @@ const GROUPS: IntegrationGroup[] = [
   {
     title: "Email",
     icon: Mail,
-    accent: "text-cyan-400",
+    iconBg: "bg-cyan-50",
+    accent: "text-cyan-600",
     blurb:
       "Отправка писем и цепочек follow-up. Настройте один из провайдеров.",
     keys: [
@@ -97,7 +101,8 @@ const GROUPS: IntegrationGroup[] = [
   {
     title: "CRM / Экспорт",
     icon: Boxes,
-    accent: "text-green-400",
+    iconBg: "bg-emerald-50",
+    accent: "text-emerald-600",
     blurb:
       "Синхронизация лидов во внешние системы и экспорт данных.",
     keys: [
@@ -133,16 +138,16 @@ export default function SettingsPage() {
         <h1 className="page-title">Настройки</h1>
         <p className="page-subtitle">
           Интеграции и переменные окружения. Все ключи задаются в{" "}
-          <span className="text-white/80">backend .env</span> — фронтенд их не
-          хранит.
+          <span className="font-medium text-ink">backend .env</span> — фронтенд
+          их не хранит.
         </p>
       </div>
 
-      <div className="flex items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-        <KeyRound className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
+      <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <KeyRound className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
         <span>
           Секреты не вводятся через интерфейс. Отредактируйте файл{" "}
-          <code className="rounded bg-black/30 px-1.5 py-0.5 text-xs text-amber-100">
+          <code className="rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-900">
             backend/.env
           </code>{" "}
           и перезапустите сервис.
@@ -155,10 +160,12 @@ export default function SettingsPage() {
           return (
             <div key={group.title} className="card p-5">
               <div className="mb-3 flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/5">
+                <div
+                  className={`flex h-9 w-9 items-center justify-center rounded-lg ${group.iconBg}`}
+                >
                   <Icon className={`h-5 w-5 ${group.accent}`} />
                 </div>
-                <h2 className="text-base font-semibold text-white">
+                <h2 className="text-base font-semibold text-ink">
                   {group.title}
                 </h2>
               </div>
@@ -171,14 +178,14 @@ export default function SettingsPage() {
                 {group.keys.map((k) => (
                   <li
                     key={k.name}
-                    className="rounded-lg border border-white/10 bg-ink/60 px-3 py-2.5"
+                    className="rounded-lg border border-line bg-slate-50/60 px-3 py-2.5"
                   >
                     <div className="flex items-center gap-2">
-                      <code className="break-all text-xs font-semibold text-brand-100">
+                      <code className="break-all text-xs font-semibold text-ink">
                         {k.name}
                       </code>
                       {k.optional && (
-                        <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-muted">
+                        <span className="rounded bg-slate-200/70 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-muted">
                           опц.
                         </span>
                       )}

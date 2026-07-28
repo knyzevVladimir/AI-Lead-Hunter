@@ -1,6 +1,7 @@
 """Orchestration pipeline: search -> ingest -> analyze -> score."""
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timezone
 
 from sqlalchemy import select
@@ -12,7 +13,10 @@ from app.models.enums import CRMStatus, Source
 from app.services.analyzer.website import analyze_website
 from app.services.parser.osm import RawCompany
 from app.services.parser.registry import get_parser
+from app.services.parser.resilience import ScraperBlockedError
 from app.services.scoring.scorer import compute_score, google_business_issues, social_summary
+
+logger = logging.getLogger(__name__)
 
 
 async def ingest_raw(db: AsyncSession, raw_list: list[RawCompany]) -> list[int]:
@@ -82,13 +86,23 @@ async def search_and_ingest(
 
     try:
         raw = await get_parser(source).search(**kwargs)
+    except ScraperBlockedError as e:
+        # Anti-bot wall: expected in production — log and fall back quietly.
+        if not use_fallback:
+            raise
+        logger.warning("Yandex parser blocked (%s); falling back to OSM", e)
+        raw = []
     except Exception:  # noqa: BLE001
         if not use_fallback:
             raise
+        logger.exception("Yandex parser failed; falling back to OSM")
         raw = []
 
     if not raw and use_fallback:
+        logger.info("Searching via OSM fallback (query=%r city=%r)", query, city)
         raw = await get_parser(Source.osm.value).search(**kwargs)
+        if raw:
+            logger.info("OSM fallback returned %d companies", len(raw))
 
     ids = await ingest_raw(db, raw)
     return len(raw), ids

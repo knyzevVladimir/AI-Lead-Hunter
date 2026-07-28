@@ -97,11 +97,11 @@ export default function ChatPage() {
       >
         {messages.length === 0 && (
           <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500/15 ring-1 ring-brand-500/40">
-              <Sparkles className="h-6 w-6 text-brand-500" />
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500 shadow-sm">
+              <Sparkles className="h-6 w-6 text-white" />
             </div>
             <div>
-              <p className="text-sm font-medium text-white">
+              <p className="text-sm font-medium text-ink">
                 Спросите что-нибудь про ваших лидов
               </p>
               <p className="mt-1 text-xs text-muted">
@@ -192,8 +192,8 @@ function MessageBubble({ message }: { message: ChatMessage }) {
         className={clsx(
           "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
           isUser
-            ? "bg-white/5 text-muted"
-            : "bg-brand-500/15 text-brand-500 ring-1 ring-brand-500/40"
+            ? "bg-slate-100 text-muted"
+            : "bg-brand-50 text-brand-500 ring-1 ring-brand-100"
         )}
       >
         {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
@@ -210,7 +210,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
             "inline-block whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm leading-relaxed",
             isUser
               ? "rounded-tr-sm bg-brand-500 text-white"
-              : "rounded-tl-sm border border-white/10 bg-ink text-white/90"
+              : "rounded-tl-sm border border-line bg-white text-ink"
           )}
         >
           {message.text}
@@ -222,9 +222,9 @@ function MessageBubble({ message }: { message: ChatMessage }) {
             {filterEntries.map(([k, v]) => (
               <span
                 key={k}
-                className="inline-flex items-center gap-1 rounded-full border border-brand-500/40 bg-brand-500/10 px-2 py-0.5 text-[11px] text-brand-100"
+                className="inline-flex items-center gap-1 rounded-full border border-brand-200 bg-brand-50 px-2 py-0.5 text-[11px] text-brand-700"
               >
-                <span className="opacity-70">{k}:</span>
+                <span className="opacity-60">{k}:</span>
                 <span className="font-medium">{String(v)}</span>
               </span>
             ))}
@@ -233,8 +233,8 @@ function MessageBubble({ message }: { message: ChatMessage }) {
 
         {/* Results table */}
         {!isUser && message.results && message.results.length > 0 && (
-          <div className="overflow-hidden rounded-lg border border-white/10">
-            <div className="border-b border-white/10 bg-white/5 px-3 py-1.5 text-[11px] font-medium text-muted">
+          <div className="overflow-hidden rounded-lg border border-line bg-white">
+            <div className="border-b border-line bg-slate-50/60 px-3 py-1.5 text-[11px] font-medium text-muted">
               Результаты: {message.total ?? message.results.length}
             </div>
             <table className="w-full border-collapse text-left">
@@ -242,9 +242,9 @@ function MessageBubble({ message }: { message: ChatMessage }) {
                 {message.results.slice(0, 12).map((c) => (
                   <tr
                     key={c.id}
-                    className="border-b border-white/5 last:border-0"
+                    className="border-b border-line last:border-0"
                   >
-                    <td className="px-3 py-2 text-sm font-medium text-white">
+                    <td className="px-3 py-2 text-sm font-medium text-ink">
                       {c.name}
                     </td>
                     <td className="px-3 py-2 text-xs text-muted">

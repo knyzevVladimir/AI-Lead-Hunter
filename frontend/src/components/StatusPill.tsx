@@ -9,35 +9,35 @@ interface StatusMeta {
 export const STATUS_META: Record<CRMStatus, StatusMeta> = {
   new: {
     label: "Новый",
-    tone: "border-slate-500/40 bg-slate-500/15 text-slate-300",
+    tone: "border-slate-200 bg-slate-50 text-slate-600",
   },
   analyzed: {
     label: "Проанализирован",
-    tone: "border-blue-500/40 bg-blue-500/15 text-blue-300",
+    tone: "border-blue-200 bg-blue-50 text-blue-700",
   },
   email_sent: {
     label: "Письмо отправлено",
-    tone: "border-indigo-500/40 bg-indigo-500/15 text-indigo-300",
+    tone: "border-indigo-200 bg-indigo-50 text-indigo-700",
   },
   replied: {
     label: "Ответил",
-    tone: "border-cyan-500/40 bg-cyan-500/15 text-cyan-300",
+    tone: "border-cyan-200 bg-cyan-50 text-cyan-700",
   },
   negotiation: {
     label: "Переговоры",
-    tone: "border-amber-500/40 bg-amber-500/15 text-amber-300",
+    tone: "border-amber-200 bg-amber-50 text-amber-700",
   },
   client: {
     label: "Клиент",
-    tone: "border-green-500/40 bg-green-500/15 text-green-300",
+    tone: "border-emerald-200 bg-emerald-50 text-emerald-700",
   },
   rejected: {
     label: "Отказ",
-    tone: "border-red-500/40 bg-red-500/15 text-red-300",
+    tone: "border-rose-200 bg-rose-50 text-rose-700",
   },
   blacklist: {
     label: "Чёрный список",
-    tone: "border-zinc-500/40 bg-zinc-500/15 text-zinc-400",
+    tone: "border-slate-300 bg-slate-100 text-slate-500",
   },
 };
 
@@ -66,7 +66,7 @@ interface StatusPillProps {
 export default function StatusPill({ status, className }: StatusPillProps) {
   const meta = STATUS_META[status] ?? {
     label: status,
-    tone: "border-white/10 bg-white/5 text-muted",
+    tone: "border-line bg-slate-50 text-muted",
   };
 
   return (

@@ -65,7 +65,7 @@ export default function LeadsMap() {
   if (isError) {
     return (
       <div
-        className="card flex items-center justify-center text-sm text-red-300"
+        className="card flex items-center justify-center text-sm text-rose-600"
         style={{ height }}
       >
         Не удалось загрузить данные для карты.
@@ -78,11 +78,11 @@ export default function LeadsMap() {
       {/* Legend + counter */}
       <div className="flex flex-wrap items-center gap-4 text-xs text-muted">
         <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded-full bg-red-500 ring-2 ring-red-500/30" />
+          <span className="inline-block h-3 w-3 rounded-full bg-rose-500 ring-2 ring-rose-200" />
           Нет сайта
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded-full bg-green-500 ring-2 ring-green-500/30" />
+          <span className="inline-block h-3 w-3 rounded-full bg-emerald-500 ring-2 ring-emerald-200" />
           Есть сайт
         </span>
         <span className="ml-auto">
@@ -91,14 +91,14 @@ export default function LeadsMap() {
       </div>
 
       <div
-        className="overflow-hidden rounded-xl border border-white/10"
+        className="overflow-hidden rounded-xl border border-line shadow-card"
         style={{ height }}
       >
         <MapContainer
           center={MOSCOW}
           zoom={DEFAULT_ZOOM}
           scrollWheelZoom
-          style={{ height: "100%", width: "100%", background: "#0b1020" }}
+          style={{ height: "100%", width: "100%", background: "#f6f7f9" }}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

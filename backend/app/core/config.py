@@ -43,6 +43,7 @@ class Settings(BaseSettings):
     YANDEX_SCRAPER_TIMEOUT: float = 30.0
     YANDEX_SCRAPER_MAX_PAGES: int = 4        # best-effort extra pages via internal API
     YANDEX_SCRAPER_DELAY: float = 1.2        # polite pause between paginated calls (s)
+    YANDEX_SCRAPER_RETRIES: int = 3          # SERP fetch attempts with UA rotation
     # If the Yandex scraper is blocked (captcha) or returns nothing, transparently
     # fall back to the always-available, key-free OpenStreetMap provider.
     YANDEX_SEARCH_FALLBACK_OSM: bool = True

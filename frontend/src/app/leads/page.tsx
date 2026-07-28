@@ -18,6 +18,7 @@ import {
   Mail,
   Star,
   ExternalLink,
+  Radar,
 } from "lucide-react";
 import {
   analyzeBatch,
@@ -132,6 +133,8 @@ export default function LeadsPage() {
   const toggleFilter = (key: BoolFilterKey) =>
     setFilters((f) => ({ ...f, [key]: !f[key] }));
 
+  const activeFilterCount = Object.values(filters).filter(Boolean).length;
+
   const onSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
@@ -203,7 +206,7 @@ export default function LeadsPage() {
               onChange={(e) => setSource(e.target.value)}
             >
               {SOURCES.map((s) => (
-                <option key={s.value} value={s.value} className="bg-panel">
+                <option key={s.value} value={s.value}>
                   {s.label}
                 </option>
               ))}
@@ -255,25 +258,28 @@ export default function LeadsPage() {
           </a>
 
           {searchMutation.isSuccess && (
-            <span className="text-xs text-green-400">
+            <span className="rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
               Найдено {searchMutation.data?.found ?? 0}, сохранено{" "}
-              {searchMutation.data?.saved ?? 0} компаний.
+              {searchMutation.data?.saved ?? 0} компаний
             </span>
           )}
           {searchMutation.isError && (
-            <span className="text-xs text-red-400">
+            <span className="rounded-md bg-rose-50 px-2.5 py-1 text-xs font-medium text-rose-700">
               {(searchMutation.error as Error)?.message}
             </span>
           )}
           {batchMutation.isSuccess && (
-            <span className="text-xs text-green-400">
-              Проанализировано: {batchMutation.data?.analyzed ?? 0}.
+            <span className="rounded-md bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
+              Проанализировано: {batchMutation.data?.analyzed ?? 0}
             </span>
           )}
         </div>
 
         {/* Filter chips */}
-        <div className="mt-5 flex flex-wrap gap-2 border-t border-white/10 pt-4">
+        <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-line pt-4">
+          <span className="mr-1 text-xs font-semibold uppercase tracking-wide text-muted">
+            Фильтры
+          </span>
           {FILTERS.map((f) => (
             <button
               key={f.key}
@@ -284,20 +290,35 @@ export default function LeadsPage() {
               {f.label}
             </button>
           ))}
+          {activeFilterCount > 0 && (
+            <button
+              type="button"
+              onClick={() =>
+                setFilters((f) =>
+                  Object.fromEntries(
+                    Object.keys(f).map((k) => [k, false])
+                  ) as Record<BoolFilterKey, boolean>
+                )
+              }
+              className="text-xs font-medium text-brand-500 hover:text-brand-600"
+            >
+              Сбросить ({activeFilterCount})
+            </button>
+          )}
         </div>
       </form>
 
       {/* Results */}
       <section className="card overflow-hidden">
-        <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
-          <h2 className="text-sm font-semibold text-white">
+        <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
+          <h2 className="text-sm font-semibold text-ink">
             Лиды{" "}
-            <span className="ml-1 text-muted">
+            <span className="ml-1 font-normal text-muted">
               {leadsQuery.isLoading ? "…" : `(${total})`}
             </span>
           </h2>
           {leadsQuery.isFetching && !leadsQuery.isLoading && (
-            <Loader2 className="h-4 w-4 animate-spin text-muted" />
+            <Loader2 className="h-4 w-4 animate-spin text-faint" />
           )}
         </div>
 
@@ -355,7 +376,7 @@ function LeadsTable({
 
   if (error) {
     return (
-      <div className="px-5 py-10 text-center text-sm text-red-300">
+      <div className="px-5 py-10 text-center text-sm text-rose-600">
         Не удалось загрузить лиды. Проверьте, что backend запущен.
       </div>
     );
@@ -363,8 +384,16 @@ function LeadsTable({
 
   if (items.length === 0) {
     return (
-      <div className="px-5 py-16 text-center text-sm text-muted">
-        Список пуст. Запустите поиск выше или снимите фильтры.
+      <div className="flex flex-col items-center gap-3 px-5 py-16 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100">
+          <Radar className="h-6 w-6 text-faint" />
+        </div>
+        <div>
+          <p className="text-sm font-medium text-ink">Список пуст</p>
+          <p className="mt-0.5 text-xs text-muted">
+            Запустите поиск выше или снимите фильтры.
+          </p>
+        </div>
       </div>
     );
   }
@@ -373,7 +402,7 @@ function LeadsTable({
     <div className="overflow-x-auto">
       <table className="w-full border-collapse">
         <thead>
-          <tr className="border-b border-white/10">
+          <tr className="border-b border-line bg-slate-50/60">
             <th className="th">Компания</th>
             <th className="th">Категория</th>
             <th className="th">Город</th>
@@ -390,11 +419,11 @@ function LeadsTable({
             return (
               <tr
                 key={c.id}
-                className="border-b border-white/5 transition-colors last:border-0 hover:bg-white/[0.03]"
+                className="border-b border-line transition-colors last:border-0 hover:bg-slate-50/70"
               >
                 {/* Company + website */}
                 <td className="td">
-                  <div className="font-medium text-white">{c.name}</div>
+                  <div className="font-medium text-ink">{c.name}</div>
                   {c.website ? (
                     <a
                       href={c.website}
@@ -407,7 +436,9 @@ function LeadsTable({
                       <ExternalLink className="h-3 w-3" />
                     </a>
                   ) : (
-                    <span className="text-xs text-red-400/80">нет сайта</span>
+                    <span className="text-xs font-medium text-rose-500">
+                      нет сайта
+                    </span>
                   )}
                 </td>
 
@@ -416,17 +447,17 @@ function LeadsTable({
 
                 {/* Contacts */}
                 <td className="td">
-                  <div className="flex items-center gap-2 text-muted">
+                  <div className="flex items-center gap-2">
                     <Phone
                       className={clsx(
                         "h-4 w-4",
-                        c.phone ? "text-teal-400" : "text-white/15"
+                        c.phone ? "text-teal-600" : "text-slate-200"
                       )}
                     />
                     <Mail
                       className={clsx(
                         "h-4 w-4",
-                        c.email ? "text-cyan-400" : "text-white/15"
+                        c.email ? "text-cyan-600" : "text-slate-200"
                       )}
                     />
                   </div>
@@ -435,7 +466,7 @@ function LeadsTable({
                 {/* Rating */}
                 <td className="td">
                   {c.rating != null ? (
-                    <div className="flex items-center gap-1 text-white/90">
+                    <div className="flex items-center gap-1 text-ink">
                       <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                       <span className="tabular-nums">
                         {c.rating.toFixed(1)}
@@ -445,7 +476,7 @@ function LeadsTable({
                       </span>
                     </div>
                   ) : (
-                    <span className="text-muted">—</span>
+                    <span className="text-faint">—</span>
                   )}
                 </td>
 

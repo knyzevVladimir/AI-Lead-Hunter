@@ -5,19 +5,29 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Brand accent — confident SaaS indigo
         brand: {
-          50: "#eef4ff",
-          100: "#d9e6ff",
-          500: "#3b6cff",
-          600: "#2f57e6",
-          700: "#2645b4",
+          50: "#eef2ff",
+          100: "#e0e7ff",
+          200: "#c7d2fe",
+          500: "#4f46e5",
+          600: "#4338ca",
+          700: "#3730a3",
         },
-        ink: "#0b1020",
-        panel: "#0f1528",
-        muted: "#8892b0",
+        // Neutral surfaces — light SaaS canvas
+        canvas: "#f6f7f9",
+        panel: "#ffffff",
+        ink: "#111827",
+        muted: "#6b7280",
+        faint: "#9ca3af",
+        line: "#e5e7eb",
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
+      },
+      boxShadow: {
+        card: "0 1px 2px 0 rgb(16 24 40 / 0.05)",
+        pop: "0 4px 16px -2px rgb(16 24 40 / 0.08), 0 2px 4px -1px rgb(16 24 40 / 0.04)",
       },
     },
   },

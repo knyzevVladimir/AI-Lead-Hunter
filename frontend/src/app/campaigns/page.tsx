@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Mail, Info } from "lucide-react";
+import { Mail, Info, Inbox } from "lucide-react";
 import { listMessages, type CampaignMessage } from "@/lib/api";
 
 const CHANNEL_LABEL: Record<string, string> = {
@@ -18,6 +18,15 @@ const MSG_STATUS_LABEL: Record<string, string> = {
   delivered: "Доставлено",
   replied: "Ответ получен",
   failed: "Ошибка",
+};
+
+const MSG_STATUS_TONE: Record<string, string> = {
+  draft: "border-slate-200 bg-slate-50 text-slate-600",
+  queued: "border-amber-200 bg-amber-50 text-amber-700",
+  sent: "border-blue-200 bg-blue-50 text-blue-700",
+  delivered: "border-cyan-200 bg-cyan-50 text-cyan-700",
+  replied: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  failed: "border-rose-200 bg-rose-50 text-rose-700",
 };
 
 function formatDate(iso: string): string {
@@ -52,21 +61,21 @@ export default function CampaignsPage() {
       </div>
 
       {/* Hint */}
-      <div className="flex items-start gap-3 rounded-lg border border-brand-500/30 bg-brand-500/10 px-4 py-3 text-sm text-brand-100">
+      <div className="flex items-start gap-3 rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-700">
         <Info className="mt-0.5 h-4 w-4 shrink-0 text-brand-500" />
         <span>
           Черновики генерируются на странице{" "}
-          <span className="font-medium text-white">«Поиск и лиды»</span> кнопкой{" "}
-          <span className="font-medium text-white">«Предложение»</span>. Здесь
-          собраны все созданные сообщения.
+          <span className="font-semibold">«Поиск и лиды»</span> кнопкой{" "}
+          <span className="font-semibold">«Предложение»</span>. Здесь собраны
+          все созданные сообщения.
         </span>
       </div>
 
       <section className="card overflow-hidden">
-        <div className="flex items-center justify-between border-b border-white/10 px-5 py-3">
-          <h2 className="text-sm font-semibold text-white">
+        <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
+          <h2 className="text-sm font-semibold text-ink">
             Сообщения{" "}
-            <span className="ml-1 text-muted">
+            <span className="ml-1 font-normal text-muted">
               {isLoading ? "…" : `(${messages.length})`}
             </span>
           </h2>
@@ -106,10 +115,10 @@ function MessagesTable({
 
   if (error) {
     return (
-      <div className="px-5 py-10 text-center text-sm text-red-300">
+      <div className="px-5 py-10 text-center text-sm text-rose-600">
         Не удалось загрузить сообщения.
         {errorMsg && (
-          <div className="mt-1 text-xs text-red-300/70">{errorMsg}</div>
+          <div className="mt-1 text-xs text-rose-500">{errorMsg}</div>
         )}
       </div>
     );
@@ -117,9 +126,16 @@ function MessagesTable({
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-3 px-5 py-16 text-center text-sm text-muted">
-        <Mail className="h-8 w-8 text-white/20" />
-        Пока нет сгенерированных сообщений.
+      <div className="flex flex-col items-center gap-3 px-5 py-16 text-center">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100">
+          <Inbox className="h-6 w-6 text-faint" />
+        </div>
+        <div>
+          <p className="text-sm font-medium text-ink">Пока пусто</p>
+          <p className="mt-0.5 text-xs text-muted">
+            Сгенерируйте первое предложение на странице «Поиск и лиды».
+          </p>
+        </div>
       </div>
     );
   }
@@ -128,7 +144,7 @@ function MessagesTable({
     <div className="overflow-x-auto">
       <table className="w-full border-collapse">
         <thead>
-          <tr className="border-b border-white/10">
+          <tr className="border-b border-line bg-slate-50/60">
             <th className="th">Компания</th>
             <th className="th">Канал</th>
             <th className="th">Тема</th>
@@ -142,16 +158,16 @@ function MessagesTable({
           {items.map((m) => (
             <tr
               key={m.id}
-              className="border-b border-white/5 transition-colors last:border-0 hover:bg-white/[0.03]"
+              className="border-b border-line transition-colors last:border-0 hover:bg-slate-50/70"
             >
               <td className="td text-muted">#{m.company_id}</td>
               <td className="td">
-                <span className="inline-flex items-center rounded-md border border-white/10 bg-white/5 px-2 py-0.5 text-xs text-white/80">
+                <span className="inline-flex items-center rounded-md border border-line bg-slate-50 px-2 py-0.5 text-xs text-ink">
                   {CHANNEL_LABEL[m.channel] ?? m.channel}
                 </span>
               </td>
-              <td className="td max-w-[220px] truncate font-medium text-white">
-                {m.subject || <span className="text-muted">—</span>}
+              <td className="td max-w-[220px] truncate font-medium text-ink">
+                {m.subject || <span className="text-faint">—</span>}
               </td>
               <td className="td max-w-[320px]">
                 <span className="line-clamp-2 text-xs text-muted">
@@ -159,7 +175,12 @@ function MessagesTable({
                 </span>
               </td>
               <td className="td">
-                <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-xs text-white/80">
+                <span
+                  className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${
+                    MSG_STATUS_TONE[m.status] ??
+                    "border-line bg-slate-50 text-muted"
+                  }`}
+                >
                   {MSG_STATUS_LABEL[m.status] ?? m.status}
                 </span>
               </td>

@@ -35,14 +35,14 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 flex w-64 flex-col border-r border-white/10 bg-panel/60 backdrop-blur">
+    <aside className="fixed inset-y-0 left-0 z-30 flex w-64 flex-col border-r border-line bg-panel">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-6 py-6">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500/15 ring-1 ring-brand-500/40">
-          <Radar className="h-5 w-5 text-brand-500" />
+      <div className="flex items-center gap-3 border-b border-line px-6 py-5">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500 shadow-sm">
+          <Radar className="h-5 w-5 text-white" />
         </div>
         <div className="leading-tight">
-          <div className="text-sm font-bold tracking-tight text-white">
+          <div className="text-sm font-bold tracking-tight text-ink">
             AI Lead Hunter
           </div>
           <div className="text-[11px] text-muted">поиск и охват клиентов</div>
@@ -50,7 +50,7 @@ export default function Sidebar() {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 space-y-1 px-3">
+      <nav className="flex-1 space-y-0.5 px-3 py-3">
         {NAV.map(({ href, label, icon: Icon }) => {
           const active =
             pathname === href || pathname.startsWith(`${href}/`);
@@ -59,10 +59,10 @@ export default function Sidebar() {
               key={href}
               href={href}
               className={clsx(
-                "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                 active
-                  ? "bg-brand-500/15 text-white ring-1 ring-brand-500/40"
-                  : "text-muted hover:bg-white/5 hover:text-white"
+                  ? "bg-brand-50 text-brand-700"
+                  : "text-muted hover:bg-slate-100 hover:text-ink"
               )}
             >
               <Icon
@@ -70,7 +70,7 @@ export default function Sidebar() {
                   "h-[18px] w-[18px] shrink-0",
                   active
                     ? "text-brand-500"
-                    : "text-muted group-hover:text-white"
+                    : "text-faint group-hover:text-muted"
                 )}
               />
               <span>{label}</span>
@@ -80,11 +80,11 @@ export default function Sidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="px-6 py-5">
-        <div className="rounded-lg border border-white/10 bg-ink/60 p-3 text-[11px] leading-relaxed text-muted">
+      <div className="border-t border-line px-4 py-4">
+        <div className="rounded-lg bg-slate-50 p-3 text-[11px] leading-relaxed text-muted">
           Ключи интеграций настраиваются в{" "}
-          <span className="text-white/80">backend .env</span>. OSM работает
-          без ключей.
+          <span className="font-medium text-ink">backend .env</span>. Яндекс.Карты
+          и OSM работают без ключей.
         </div>
       </div>
     </aside>

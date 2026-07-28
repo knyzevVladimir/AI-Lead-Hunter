@@ -34,6 +34,7 @@ from __future__ import annotations
 import asyncio
 import html as _html
 import json
+import logging
 import re
 from urllib.parse import urlsplit, urlunsplit, parse_qsl, urlencode
 
@@ -42,6 +43,21 @@ import httpx
 from app.core.config import settings
 from app.services.parser.geo import geocode, km_to_deg
 from app.services.parser.osm import RawCompany
+from app.services.parser.resilience import (
+    ScraperBlockedError,
+    get_with_retries,
+    pick_user_agent,
+)
+
+logger = logging.getLogger(__name__)
+
+# Markers of Yandex's anti-bot walls (regular captcha, smart captcha, and the
+# "confirm you're not a robot" interstitial). Centralised so new markers are
+# easy to add when Yandex changes its block pages.
+_CAPTCHA_RE = re.compile(
+    r"captcha|showcaptcha|smartcaptcha|are you not a robot|checkbox-captcha",
+    re.I,
+)
 
 # The <script> that carries the embedded application state.
 _STATE_RE = re.compile(
@@ -235,9 +251,9 @@ class YandexMapsParser:
         s = urlsplit(self._base())
         return f"{s.scheme}://{s.netloc}"
 
-    def _headers(self) -> dict[str, str]:
+    def _headers(self, user_agent: str | None = None) -> dict[str, str]:
         return {
-            "User-Agent": settings.YANDEX_USER_AGENT,
+            "User-Agent": user_agent or settings.YANDEX_USER_AGENT,
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Language": "ru,en;q=0.9",
             "Upgrade-Insecure-Requests": "1",
@@ -268,21 +284,52 @@ class YandexMapsParser:
 
         timeout = httpx.Timeout(settings.YANDEX_SCRAPER_TIMEOUT)
         async with httpx.AsyncClient(
-            timeout=timeout, headers=self._headers(), follow_redirects=True
+            timeout=timeout, follow_redirects=True
         ) as client:
-            resp = await client.get(base, params=params)
-            resp.raise_for_status()
-            html_text = resp.text
+            # Retry the SERP fetch across rotating User-Agents: a single
+            # throttled identity should not sink the whole search.
+            html_text: str | None = None
+            last_error: Exception | None = None
+            ua: str | None = None
+            for attempt in range(settings.YANDEX_SCRAPER_RETRIES):
+                ua = pick_user_agent(settings.YANDEX_USER_AGENT, exclude=ua)
+                try:
+                    resp = await get_with_retries(
+                        client, base, params=params, headers=self._headers(ua)
+                    )
+                    html_text = resp.text
+                    break
+                except httpx.HTTPStatusError as e:
+                    last_error = e
+                    if e.response.status_code == 403 and attempt < settings.YANDEX_SCRAPER_RETRIES - 1:
+                        logger.info("Yandex SERP 403 (attempt %d), rotating UA", attempt + 1)
+                        await asyncio.sleep(1.0 * (attempt + 1))
+                        continue
+                    raise
+                except httpx.HTTPError as e:
+                    last_error = e
+                    if attempt < settings.YANDEX_SCRAPER_RETRIES - 1:
+                        logger.info("Yandex SERP network error (attempt %d): %s", attempt + 1, e)
+                        continue
+                    raise
+
+            if html_text is None:
+                raise RuntimeError(f"Yandex Maps: SERP fetch failed: {last_error}")
+
+            # Anti-bot walls can arrive with a 200 status — always sniff the body.
+            if _CAPTCHA_RE.search(html_text) and _extract_state(html_text) is None:
+                raise ScraperBlockedError(
+                    "Яндекс.Карты показали капчу (анти-бот защита). "
+                    "Поиск автоматически переключён на OpenStreetMap. "
+                    "Повторите позже или смените IP/настройте прокси для Яндекса."
+                )
 
             state = _extract_state(html_text)
             if state is None:
-                # No embedded results — almost always an anti-bot / captcha wall.
-                if re.search(r"captcha|showcaptcha|smartcaptcha", html_text, re.I):
-                    raise RuntimeError(
-                        "Yandex Maps returned a captcha wall (anti-bot). "
-                        "Retry later or from a different IP; the pipeline can fall back to OSM."
-                    )
-                raise RuntimeError("Yandex Maps: could not locate embedded results in the page")
+                raise RuntimeError(
+                    "Yandex Maps: could not locate embedded results in the page "
+                    "(markup changed or empty SERP)"
+                )
 
             results: list[RawCompany] = [
                 c for c in (

@@ -22,7 +22,8 @@ interface StatCardDef {
   key: keyof DashboardStats;
   label: string;
   icon: LucideIcon;
-  accent: string;
+  iconBg: string;
+  iconColor: string;
   suffix?: string;
 }
 
@@ -31,38 +32,50 @@ const CARDS: StatCardDef[] = [
     key: "companies_found",
     label: "Найдено компаний",
     icon: Building2,
-    accent: "text-brand-500",
+    iconBg: "bg-brand-50",
+    iconColor: "text-brand-500",
   },
   {
     key: "without_website",
     label: "Без сайта",
     icon: Globe2,
-    accent: "text-red-400",
+    iconBg: "bg-rose-50",
+    iconColor: "text-rose-500",
   },
-  { key: "with_email", label: "Есть Email", icon: Mail, accent: "text-cyan-400" },
+  {
+    key: "with_email",
+    label: "Есть Email",
+    icon: Mail,
+    iconBg: "bg-cyan-50",
+    iconColor: "text-cyan-600",
+  },
   {
     key: "very_promising",
     label: "Очень перспективных",
     icon: Flame,
-    accent: "text-orange-400",
+    iconBg: "bg-orange-50",
+    iconColor: "text-orange-500",
   },
   {
     key: "emails_sent",
     label: "Отправлено писем",
     icon: Send,
-    accent: "text-indigo-400",
+    iconBg: "bg-indigo-50",
+    iconColor: "text-indigo-500",
   },
   {
     key: "replies",
     label: "Ответов",
     icon: MessageCircleReply,
-    accent: "text-teal-400",
+    iconBg: "bg-teal-50",
+    iconColor: "text-teal-600",
   },
   {
     key: "conversion",
     label: "Конверсия",
     icon: TrendingUp,
-    accent: "text-green-400",
+    iconBg: "bg-emerald-50",
+    iconColor: "text-emerald-600",
     suffix: "%",
   },
 ];
@@ -78,23 +91,29 @@ function StatCard({
 }) {
   const Icon = def.icon;
   return (
-    <div className="card card-hover p-5">
-      <div className="mb-3 flex items-center justify-between">
-        <span className="text-xs font-medium uppercase tracking-wide text-muted">
-          {def.label}
-        </span>
-        <Icon className={`h-4 w-4 ${def.accent}`} />
+    <div className="card card-hover flex items-center gap-4 p-5">
+      <div
+        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${def.iconBg}`}
+      >
+        <Icon className={`h-5 w-5 ${def.iconColor}`} />
       </div>
-      {loading ? (
-        <div className="skeleton h-9 w-20" />
-      ) : (
-        <div className="text-3xl font-bold tabular-nums text-white">
-          {value ?? 0}
-          {def.suffix && (
-            <span className="ml-0.5 text-xl text-muted">{def.suffix}</span>
-          )}
+      <div className="min-w-0">
+        <div className="truncate text-xs font-medium text-muted">
+          {def.label}
         </div>
-      )}
+        {loading ? (
+          <div className="skeleton mt-1.5 h-7 w-16" />
+        ) : (
+          <div className="text-2xl font-bold tabular-nums text-ink">
+            {value ?? 0}
+            {def.suffix && (
+              <span className="ml-0.5 text-base font-semibold text-muted">
+                {def.suffix}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -125,9 +144,9 @@ export default function DashboardPage() {
 
       {/* Error banner */}
       {statsQuery.isError && (
-        <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+        <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
           Не удалось загрузить статистику.{" "}
-          <span className="text-red-300/70">
+          <span className="text-rose-500">
             {(statsQuery.error as Error)?.message}
           </span>
         </div>
@@ -147,9 +166,9 @@ export default function DashboardPage() {
 
       {/* Most promising */}
       <section className="card overflow-hidden">
-        <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
+        <div className="flex items-center justify-between border-b border-line px-5 py-4">
           <div>
-            <h2 className="text-base font-semibold text-white">
+            <h2 className="text-base font-semibold text-ink">
               Самые перспективные
             </h2>
             <p className="text-xs text-muted">
@@ -195,7 +214,7 @@ function PromisingTable({
 
   if (error) {
     return (
-      <div className="px-5 py-8 text-center text-sm text-red-300">
+      <div className="px-5 py-8 text-center text-sm text-rose-600">
         Ошибка загрузки списка.
       </div>
     );
@@ -205,7 +224,7 @@ function PromisingTable({
     return (
       <div className="px-5 py-12 text-center text-sm text-muted">
         Пока нет перспективных лидов. Запустите поиск и анализ на странице{" "}
-        <Link href="/leads" className="text-brand-500 hover:text-brand-600">
+        <Link href="/leads" className="font-medium text-brand-500 hover:text-brand-600">
           «Поиск и лиды»
         </Link>
         .
@@ -217,7 +236,7 @@ function PromisingTable({
     <div className="overflow-x-auto">
       <table className="w-full border-collapse">
         <thead>
-          <tr className="border-b border-white/10">
+          <tr className="border-b border-line bg-slate-50/60">
             <th className="th">Компания</th>
             <th className="th">Город</th>
             <th className="th">Категория</th>
@@ -229,9 +248,9 @@ function PromisingTable({
           {items.map((c) => (
             <tr
               key={c.id}
-              className="border-b border-white/5 transition-colors last:border-0 hover:bg-white/[0.03]"
+              className="border-b border-line transition-colors last:border-0 hover:bg-slate-50/70"
             >
-              <td className="td font-medium text-white">{c.name}</td>
+              <td className="td font-medium text-ink">{c.name}</td>
               <td className="td text-muted">{c.city ?? "—"}</td>
               <td className="td text-muted">{c.category ?? "—"}</td>
               <td className="td">

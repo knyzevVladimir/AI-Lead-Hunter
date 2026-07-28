@@ -41,7 +41,7 @@ export default function CrmPage() {
           </p>
         </div>
         {boardQuery.isFetching && !boardQuery.isLoading && (
-          <Loader2 className="h-4 w-4 animate-spin text-muted" />
+          <Loader2 className="h-4 w-4 animate-spin text-faint" />
         )}
       </div>
 
@@ -53,7 +53,7 @@ export default function CrmPage() {
       )}
 
       {boardQuery.isError && (
-        <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+        <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
           Не удалось загрузить CRM-доску.
         </div>
       )}
@@ -66,19 +66,19 @@ export default function CrmPage() {
             return (
               <div
                 key={status}
-                className="flex w-72 shrink-0 flex-col rounded-xl border border-white/10 bg-panel/60"
+                className="flex w-72 shrink-0 flex-col rounded-xl border border-line bg-slate-50/80"
               >
                 {/* Column header */}
-                <div className="flex items-center justify-between gap-2 border-b border-white/10 px-4 py-3">
+                <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-3">
                   <div className="flex items-center gap-2">
                     <span
                       className={`h-2 w-2 rounded-full ${dotColor(status)}`}
                     />
-                    <span className="text-sm font-semibold text-white">
+                    <span className="text-sm font-semibold text-ink">
                       {meta?.label ?? status}
                     </span>
                   </div>
-                  <span className="rounded-full bg-white/5 px-2 py-0.5 text-xs font-medium text-muted">
+                  <span className="rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-muted ring-1 ring-line">
                     {cards.length}
                   </span>
                 </div>
@@ -86,7 +86,7 @@ export default function CrmPage() {
                 {/* Cards */}
                 <div className="flex-1 space-y-2 p-3">
                   {cards.length === 0 ? (
-                    <div className="rounded-lg border border-dashed border-white/10 px-3 py-6 text-center text-xs text-muted">
+                    <div className="rounded-lg border border-dashed border-line px-3 py-6 text-center text-xs text-faint">
                       Пусто
                     </div>
                   ) : (
@@ -128,9 +128,9 @@ function CrmCard({
   onChange: (status: CRMStatus) => void;
 }) {
   return (
-    <div className="card card-hover bg-ink/60 p-3">
+    <div className="card card-hover bg-white p-3">
       <div className="mb-1 flex items-start justify-between gap-2">
-        <div className="text-sm font-medium leading-snug text-white">
+        <div className="text-sm font-medium leading-snug text-ink">
           {company.name}
         </div>
         <ScoreBadge score={company.ai_score} className="min-w-0 shrink-0" />
@@ -148,16 +148,16 @@ function CrmCard({
           value={company.status}
           disabled={pending}
           onChange={(e) => onChange(e.target.value as CRMStatus)}
-          className="w-full rounded-md border border-white/10 bg-panel px-2 py-1.5 text-xs text-white/90 focus:border-brand-500 focus:outline-none disabled:opacity-50"
+          className="w-full rounded-md border border-line bg-white px-2 py-1.5 text-xs text-ink focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:opacity-50"
         >
           {STATUS_ORDER.map((s) => (
-            <option key={s} value={s} className="bg-panel">
+            <option key={s} value={s}>
               {statusLabel(s)}
             </option>
           ))}
         </select>
         {pending && (
-          <Loader2 className="pointer-events-none absolute right-6 top-1/2 h-3.5 w-3.5 -translate-y-1/2 animate-spin text-muted" />
+          <Loader2 className="pointer-events-none absolute right-6 top-1/2 h-3.5 w-3.5 -translate-y-1/2 animate-spin text-faint" />
         )}
       </div>
     </div>
@@ -168,13 +168,13 @@ function CrmCard({
 function dotColor(status: CRMStatus): string {
   const map: Record<CRMStatus, string> = {
     new: "bg-slate-400",
-    analyzed: "bg-blue-400",
-    email_sent: "bg-indigo-400",
-    replied: "bg-cyan-400",
-    negotiation: "bg-amber-400",
-    client: "bg-green-400",
-    rejected: "bg-red-400",
-    blacklist: "bg-zinc-500",
+    analyzed: "bg-blue-500",
+    email_sent: "bg-indigo-500",
+    replied: "bg-cyan-500",
+    negotiation: "bg-amber-500",
+    client: "bg-emerald-500",
+    rejected: "bg-rose-500",
+    blacklist: "bg-slate-500",
   };
-  return map[status] ?? "bg-white/40";
+  return map[status] ?? "bg-slate-300";
 }
