@@ -1,25 +1,32 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
-import Providers from "@/components/Providers";
-import Sidebar from "@/components/Sidebar";
+import { AppShell } from "@/components/layout/app-shell";
+import { AppProviders } from "@/providers/app-providers";
 
 export const metadata: Metadata = {
-  title: "AI Lead Hunter",
-  description:
-    "AI-платформа для поиска локального бизнеса, анализа цифрового присутствия и автоматизации клиентского охвата.",
+  title: {
+    default: "AI Lead Hunter",
+    template: "%s · AI Lead Hunter",
+  },
+  description: "Revenue intelligence workspace for local business discovery, analysis and outreach.",
+  applicationName: "AI Lead Hunter",
+  icons: { icon: "/favicon.svg" },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#f7f8fa",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ru">
+    <html lang="ru" suppressHydrationWarning>
       <body>
-        <Providers>
-          <Sidebar />
-          <main className="ml-64 min-h-screen">
-            <div className="mx-auto max-w-[1400px] px-8 py-8">{children}</div>
-          </main>
-        </Providers>
+        <AppProviders>
+          <AppShell>{children}</AppShell>
+        </AppProviders>
       </body>
     </html>
   );
