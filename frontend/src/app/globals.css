@@ -1,40 +1,400 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* ==========================================================================
+   AI LEAD HUNTER — ДИЗАЙН-СИСТЕМА
+   Одна палитра, две темы. Все цвета в OKLCH: перцептивно равномерная яркость,
+   поэтому светлая и тёмная тема получаются из одного набора решений, а не
+   подбираются на глаз по отдельности.
+   ========================================================================== */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* --------------------------------------------------------------------------
+   1. СЫРЫЕ ЗНАЧЕНИЯ ТЕМ
+   -------------------------------------------------------------------------- */
+
+:root {
+  /* Светлая тема — холодный бумажный нейтрал, не чистый белый:
+     на больших плоскостях чистый белый бьёт по глазам при долгой работе. */
+  --bg: oklch(0.985 0.002 285);
+  --bg-subtle: oklch(0.965 0.003 285);
+  --surface: oklch(1 0 0);
+  --surface-2: oklch(0.978 0.003 285);
+  --surface-3: oklch(0.958 0.004 285);
+  --surface-inset: oklch(0.955 0.004 285);
+
+  --border: oklch(0.915 0.005 285);
+  --border-strong: oklch(0.855 0.008 285);
+  --border-hover: oklch(0.875 0.008 285);
+
+  --fg: oklch(0.205 0.012 285);
+  --fg-muted: oklch(0.475 0.012 285);
+  --fg-subtle: oklch(0.595 0.012 285);
+  --fg-faint: oklch(0.7 0.01 285);
+  --fg-on-accent: oklch(1 0 0);
+
+  --accent: oklch(0.545 0.235 285);
+  --accent-hover: oklch(0.495 0.235 285);
+  --accent-active: oklch(0.455 0.225 285);
+  --accent-fg: oklch(1 0 0);
+  --accent-subtle: oklch(0.955 0.025 285);
+  --accent-subtle-hover: oklch(0.925 0.04 285);
+  --accent-border: oklch(0.85 0.075 285);
+  --accent-text: oklch(0.5 0.22 285);
+
+  /* Отдельный акцент для AI-моментов: подсказки, генерация, объяснения.
+     Он должен отличаться от основного акцента интерфейса, иначе «где кнопка,
+     а где ответ модели» перестаёт читаться. */
+  --ai: oklch(0.62 0.13 205);
+  --ai-fg: oklch(1 0 0);
+  --ai-subtle: oklch(0.955 0.025 205);
+  --ai-border: oklch(0.85 0.06 205);
+  --ai-text: oklch(0.5 0.12 205);
+
+  --success: oklch(0.58 0.15 155);
+  --success-subtle: oklch(0.955 0.03 155);
+  --success-border: oklch(0.85 0.08 155);
+  --success-text: oklch(0.48 0.13 155);
+
+  --warning: oklch(0.68 0.15 70);
+  --warning-subtle: oklch(0.965 0.04 80);
+  --warning-border: oklch(0.87 0.09 80);
+  --warning-text: oklch(0.5 0.13 60);
+
+  --danger: oklch(0.575 0.215 22);
+  --danger-subtle: oklch(0.96 0.025 22);
+  --danger-border: oklch(0.87 0.07 22);
+  --danger-text: oklch(0.52 0.2 22);
+
+  --info: oklch(0.58 0.16 250);
+  --info-subtle: oklch(0.96 0.025 250);
+  --info-border: oklch(0.86 0.07 250);
+  --info-text: oklch(0.5 0.16 250);
+
+  /* Шкала «температуры» лида по AI-скору: от холодного к горячему.
+     Красный намеренно не используется — отсутствие сайта это возможность,
+     а не ошибка, и палитра не должна читаться как предупреждение. */
+  --score-cold: oklch(0.62 0.015 285);
+  --score-cool: oklch(0.6 0.13 250);
+  --score-warm: oklch(0.58 0.2 300);
+  --score-hot: oklch(0.65 0.17 45);
+  --score-blazing: oklch(0.63 0.21 30);
+
+  --ring: oklch(0.545 0.235 285 / 0.4);
+  --overlay: oklch(0.2 0.01 285 / 0.4);
+  --glass: oklch(1 0 0 / 0.72);
+  --glass-border: oklch(1 0 0 / 0.6);
+
+  --shadow-color: 285 25% 12%;
+  --map-scheme: light;
+
+  color-scheme: light;
+}
+
+.dark {
+  /* Тёмная тема — графит с холодным подтоном. Уровни поверхностей различимы,
+     но разница между соседними ступенями мала: контраст даёт свет, а не рамки. */
+  --bg: oklch(0.155 0.008 285);
+  --bg-subtle: oklch(0.13 0.008 285);
+  --surface: oklch(0.192 0.009 285);
+  --surface-2: oklch(0.223 0.011 285);
+  --surface-3: oklch(0.258 0.012 285);
+  --surface-inset: oklch(0.135 0.008 285);
+
+  --border: oklch(0.278 0.012 285);
+  --border-strong: oklch(0.37 0.015 285);
+  --border-hover: oklch(0.34 0.014 285);
+
+  --fg: oklch(0.965 0.004 285);
+  --fg-muted: oklch(0.735 0.012 285);
+  --fg-subtle: oklch(0.61 0.013 285);
+  --fg-faint: oklch(0.485 0.013 285);
+  --fg-on-accent: oklch(1 0 0);
+
+  --accent: oklch(0.635 0.215 285);
+  --accent-hover: oklch(0.685 0.205 285);
+  --accent-active: oklch(0.6 0.22 285);
+  --accent-fg: oklch(0.145 0.02 285);
+  --accent-subtle: oklch(0.28 0.075 285);
+  --accent-subtle-hover: oklch(0.33 0.09 285);
+  --accent-border: oklch(0.4 0.13 285);
+  --accent-text: oklch(0.79 0.13 285);
+
+  --ai: oklch(0.76 0.13 200);
+  --ai-fg: oklch(0.16 0.02 200);
+  --ai-subtle: oklch(0.27 0.05 200);
+  --ai-border: oklch(0.4 0.08 200);
+  --ai-text: oklch(0.82 0.1 200);
+
+  --success: oklch(0.72 0.17 155);
+  --success-subtle: oklch(0.27 0.06 155);
+  --success-border: oklch(0.4 0.1 155);
+  --success-text: oklch(0.82 0.14 155);
+
+  --warning: oklch(0.8 0.16 80);
+  --warning-subtle: oklch(0.29 0.06 80);
+  --warning-border: oklch(0.42 0.1 80);
+  --warning-text: oklch(0.87 0.13 85);
+
+  --danger: oklch(0.655 0.21 22);
+  --danger-subtle: oklch(0.28 0.08 22);
+  --danger-border: oklch(0.42 0.13 22);
+  --danger-text: oklch(0.79 0.15 22);
+
+  --info: oklch(0.7 0.15 250);
+  --info-subtle: oklch(0.28 0.07 250);
+  --info-border: oklch(0.41 0.11 250);
+  --info-text: oklch(0.82 0.11 250);
+
+  --score-cold: oklch(0.58 0.015 285);
+  --score-cool: oklch(0.7 0.13 240);
+  --score-warm: oklch(0.7 0.17 300);
+  --score-hot: oklch(0.78 0.15 60);
+  --score-blazing: oklch(0.72 0.19 38);
+
+  --ring: oklch(0.7 0.19 285 / 0.55);
+  --overlay: oklch(0.09 0.01 285 / 0.65);
+  --glass: oklch(0.21 0.01 285 / 0.72);
+  --glass-border: oklch(1 0 0 / 0.08);
+
+  --shadow-color: 285 60% 2%;
+  --map-scheme: dark;
+
+  color-scheme: dark;
+}
+
+/* --------------------------------------------------------------------------
+   2. ТОКЕНЫ TAILWIND
+   inline — чтобы утилиты ссылались на переменную, а не на её вычисленное
+   значение: иначе переключение темы не подхватывалось бы.
+   -------------------------------------------------------------------------- */
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-subtle: var(--bg-subtle);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-surface-inset: var(--surface-inset);
+
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-border-hover: var(--border-hover);
+
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-fg-faint: var(--fg-faint);
+  --color-fg-on-accent: var(--fg-on-accent);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-active: var(--accent-active);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-accent-subtle-hover: var(--accent-subtle-hover);
+  --color-accent-border: var(--accent-border);
+  --color-accent-text: var(--accent-text);
+
+  --color-ai: var(--ai);
+  --color-ai-fg: var(--ai-fg);
+  --color-ai-subtle: var(--ai-subtle);
+  --color-ai-border: var(--ai-border);
+  --color-ai-text: var(--ai-text);
+
+  --color-success: var(--success);
+  --color-success-subtle: var(--success-subtle);
+  --color-success-border: var(--success-border);
+  --color-success-text: var(--success-text);
+
+  --color-warning: var(--warning);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-warning-border: var(--warning-border);
+  --color-warning-text: var(--warning-text);
+
+  --color-danger: var(--danger);
+  --color-danger-subtle: var(--danger-subtle);
+  --color-danger-border: var(--danger-border);
+  --color-danger-text: var(--danger-text);
+
+  --color-info: var(--info);
+  --color-info-subtle: var(--info-subtle);
+  --color-info-border: var(--info-border);
+  --color-info-text: var(--info-text);
+
+  --color-score-cold: var(--score-cold);
+  --color-score-cool: var(--score-cool);
+  --color-score-warm: var(--score-warm);
+  --color-score-hot: var(--score-hot);
+  --color-score-blazing: var(--score-blazing);
+
+  --color-ring: var(--ring);
+  --color-overlay: var(--overlay);
+  --color-glass: var(--glass);
+  --color-glass-border: var(--glass-border);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-jb), ui-monospace, "SF Mono", monospace;
+
+  /* Радиусы: единая геометрия. Крупные плоскости мягче, мелкие элементы острее,
+     иначе на маленьких контролах скругление съедает текст. */
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.75rem;
+
+  /* Тени построены на одном цветовом тоне с фоном — «серая» тень на цветном
+     графите выглядит грязно. */
+  --shadow-xs: 0 1px 2px -1px hsl(var(--shadow-color) / 0.12);
+  --shadow-sm:
+    0 1px 3px -1px hsl(var(--shadow-color) / 0.14),
+    0 1px 2px -1px hsl(var(--shadow-color) / 0.08);
+  --shadow-md:
+    0 4px 12px -3px hsl(var(--shadow-color) / 0.16),
+    0 2px 4px -2px hsl(var(--shadow-color) / 0.1);
+  --shadow-lg:
+    0 12px 28px -8px hsl(var(--shadow-color) / 0.24),
+    0 4px 10px -4px hsl(var(--shadow-color) / 0.12);
+  --shadow-xl:
+    0 24px 56px -12px hsl(var(--shadow-color) / 0.32),
+    0 8px 20px -8px hsl(var(--shadow-color) / 0.16);
+  --shadow-pop:
+    0 16px 40px -12px hsl(var(--shadow-color) / 0.3),
+    0 2px 8px -2px hsl(var(--shadow-color) / 0.14);
+
+  /* Кривые: стандартная для перемещений, «выход» для появления,
+     spring-подобная для интерактивной обратной связи. */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  --animate-fade-in: fade-in 0.2s var(--ease-out-quint);
+  --animate-rise: rise 0.32s var(--ease-out-quint);
+  --animate-scale-in: scale-in 0.16s var(--ease-out-quint);
+  --animate-shimmer: shimmer 1.8s linear infinite;
+  --animate-pulse-ring: pulse-ring 2s var(--ease-standard) infinite;
+  --animate-sweep: sweep 2.4s var(--ease-standard) infinite;
+  --animate-spin-slow: spin 2.4s linear infinite;
+  --animate-caret: caret 1.1s steps(1) infinite;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 var(--ring);
+  }
+  70% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@keyframes sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. БАЗОВЫЙ СЛОЙ
+   -------------------------------------------------------------------------- */
 
 @layer base {
-  :root {
-    color-scheme: light;
-  }
-
-  html,
-  body {
-    background-color: #f6f7f9;
-    color: #111827;
-    font-family: "Inter", system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-  }
-
-  body {
-    min-height: 100vh;
-  }
-
   * {
-    box-sizing: border-box;
+    border-color: var(--border);
   }
 
-  a {
-    color: inherit;
-    text-decoration: none;
+  html {
+    -webkit-tap-highlight-color: transparent;
   }
 
-  /* Subtle light-theme scrollbars */
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    overscroll-behavior-y: none;
+  }
+
+  /* Заголовки: плотный трекинг на крупных кеглях — иначе набор выглядит рыхлым. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Цифры в таблицах должны стоять в колонку. */
+  .tabular,
+  table,
+  [data-numeric] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    background-color: var(--accent-subtle);
+    color: var(--fg);
+  }
+
+  /* Единое кольцо фокуса на весь интерфейс. Только focus-visible: мышь
+     не должна рисовать кольца. */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgba(17, 24, 39, 0.18) transparent;
+    scrollbar-color: var(--border-strong) transparent;
   }
   *::-webkit-scrollbar {
     width: 10px;
@@ -44,83 +404,185 @@
     background: transparent;
   }
   *::-webkit-scrollbar-thumb {
-    background-color: rgba(17, 24, 39, 0.14);
+    background-color: var(--border-strong);
     border-radius: 999px;
-    border: 2px solid transparent;
+    border: 3px solid transparent;
     background-clip: content-box;
   }
   *::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(17, 24, 39, 0.26);
+    background-color: var(--fg-faint);
+  }
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* Уважение к системной настройке: полностью снимаем движение, но оставляем
+     мгновенные смены состояний, чтобы интерфейс не «залипал». */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
+/* --------------------------------------------------------------------------
+   4. УТИЛИТЫ ПОВТОРЯЮЩИХСЯ ПАТТЕРНОВ
+   Только то, что встречается на нескольких экранах и не заслуживает
+   отдельного компонента.
+   -------------------------------------------------------------------------- */
+
+/* Стеклянная поверхность для плавающих слоёв: доки, оверлеи карты, ⌘K.
+   Backdrop-filter дорогой, поэтому только на некрупных всплывающих панелях. */
+@utility glass {
+  background-color: var(--glass);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+}
+
+@utility glass-strong {
+  background-color: color-mix(in oklab, var(--surface) 88%, transparent);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border: 1px solid var(--glass-border);
+}
+
+/* Скрытый, но доступный скринридеру. */
+@utility sr-only-focusable {
+  &:not(:focus):not(:focus-within) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* Плавная анимация появления списков через CSS-переменную задержки. */
+@utility stagger {
+  animation: rise 0.36s var(--ease-out-quint) both;
+  animation-delay: calc(var(--i, 0) * 40ms);
+}
+
 @layer components {
-  /* Card surface used across the app */
-  .card {
-    @apply rounded-xl border border-line bg-panel shadow-card;
+  /* Световая кромка на верхней границе панели. */
+  .panel-edge {
+    position: relative;
+  }
+  .panel-edge::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--fg) 12%, transparent),
+      transparent
+    );
+    pointer-events: none;
   }
 
-  .card-hover {
-    @apply transition-shadow hover:shadow-pop;
+  /* Сетка-подложка для пустых состояний и hero. */
+  .grid-pattern {
+    background-image:
+      linear-gradient(
+        to right,
+        color-mix(in oklab, var(--fg) 6%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        to bottom,
+        color-mix(in oklab, var(--fg) 6%, transparent) 1px,
+        transparent 1px
+      );
+    background-size: 48px 48px;
   }
 
-  /* Section / page heading */
-  .page-title {
-    @apply text-2xl font-bold tracking-tight text-ink;
+  /* Маска затухания к краям — для лент, каруселей и подложек. */
+  .fade-edges-y {
+    mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      black 8%,
+      black 92%,
+      transparent
+    );
   }
+  .fade-edges-x {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 6%,
+      black 94%,
+      transparent
+    );
+  }
+  .fade-bottom {
+    mask-image: linear-gradient(to bottom, black 55%, transparent);
+  }
+}
 
-  .page-subtitle {
-    @apply mt-0.5 text-sm text-muted;
-  }
+/* --------------------------------------------------------------------------
+   5. ИНТЕГРАЦИЯ СТОРОННИХ БИБЛИОТЕК С ТЕМОЙ
+   -------------------------------------------------------------------------- */
 
-  /* Inputs */
-  .input {
-    @apply w-full rounded-lg border border-line bg-white px-3 py-2 text-sm
-      text-ink placeholder:text-faint
-      focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20;
-  }
+/* MapLibre: убираем дефолтный вид контролов и приводим к дизайн-системе. */
+.maplibregl-map {
+  font-family: var(--font-sans) !important;
+}
+.maplibregl-ctrl-group {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-md) !important;
+  overflow: hidden;
+}
+.maplibregl-ctrl-group button {
+  width: 32px !important;
+  height: 32px !important;
+  background-color: transparent !important;
+}
+.maplibregl-ctrl-group button + button {
+  border-top: 1px solid var(--border) !important;
+}
+.maplibregl-ctrl-group button:hover {
+  background-color: var(--surface-2) !important;
+}
+.maplibregl-ctrl-group button span {
+  filter: var(--map-icon-filter, none);
+}
+.dark .maplibregl-ctrl-group button span {
+  filter: invert(1) brightness(1.6);
+}
+.maplibregl-ctrl-attrib {
+  background: color-mix(in oklab, var(--surface) 80%, transparent) !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 10px !important;
+}
+.maplibregl-ctrl-attrib a {
+  color: var(--fg-subtle) !important;
+}
+.maplibregl-popup-content {
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: var(--radius-lg) !important;
+}
+.maplibregl-popup-tip {
+  display: none !important;
+}
+.maplibregl-canvas:focus {
+  outline: none;
+}
 
-  .label {
-    @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-muted;
-  }
-
-  /* Buttons */
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2
-      text-sm font-medium transition-colors disabled:cursor-not-allowed
-      disabled:opacity-50;
-  }
-  .btn-primary {
-    @apply btn bg-brand-500 text-white shadow-sm hover:bg-brand-600;
-  }
-  .btn-secondary {
-    @apply btn border border-line bg-white text-ink hover:bg-slate-50;
-  }
-  .btn-ghost {
-    @apply btn text-muted hover:bg-slate-100 hover:text-ink;
-  }
-
-  /* Chips */
-  .chip {
-    @apply inline-flex items-center gap-1.5 rounded-full border px-3 py-1
-      text-xs font-medium transition-colors;
-  }
-  .chip-off {
-    @apply chip border-line bg-white text-muted hover:border-slate-300 hover:text-ink;
-  }
-  .chip-on {
-    @apply chip border-brand-500 bg-brand-50 text-brand-700;
-  }
-
-  /* Table helpers */
-  .th {
-    @apply px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-muted;
-  }
-  .td {
-    @apply px-4 py-3 align-middle text-sm text-ink;
-  }
-
-  .skeleton {
-    @apply animate-pulse rounded-md bg-slate-100;
-  }
+/* Курсор лассо на карте задаётся классом на контейнере. */
+.map-lasso .maplibregl-canvas-container {
+  cursor: crosshair !important;
 }
