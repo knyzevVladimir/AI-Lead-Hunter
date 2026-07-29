@@ -6,7 +6,7 @@ import { AlertCircle, CheckCircle2, Info, X } from "lucide-react";
 import { cn } from "@/utils/cn";
 
 type ToastTone = "success" | "error" | "info";
-interface ToastInput { title: string; description?: string; tone?: ToastTone }
+interface ToastInput { title: string; description?: string; tone?: ToastTone; action?: { label: string; onClick: () => void } }
 interface ToastItem extends ToastInput { id: string }
 interface ToastContextValue { toast: (input: ToastInput) => void }
 
@@ -42,6 +42,7 @@ function ToastView({ item, onClose }: { item: ToastItem; onClose: () => void }) 
       <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold text-slate-900">{item.title}</p>
         {item.description && <p className="mt-0.5 text-xs leading-5 text-slate-500">{item.description}</p>}
+        {item.action && <button type="button" onClick={() => { item.action?.onClick(); onClose(); }} className="mt-2 text-xs font-semibold text-violet-600 hover:text-violet-700">{item.action.label}</button>}
       </div>
       <button type="button" onClick={onClose} className="-mr-1 -mt-1 rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700" aria-label="Закрыть уведомление"><X className="h-3.5 w-3.5" /></button>
     </motion.div>
