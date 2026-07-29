@@ -134,6 +134,17 @@
   margin: 0 !important;
 }
 
+.leaflet-tooltip.cluster-count {
+  border: 0;
+  background: transparent;
+  color: white;
+  box-shadow: none;
+}
+
+.leaflet-tooltip.cluster-count::before {
+  display: none;
+}
+
 .prose-chat {
   color: #334155;
   font-size: 0.875rem;
